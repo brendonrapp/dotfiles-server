@@ -1,0 +1,26 @@
+#!/bin/sh
+# vim:set syntax=bash
+
+export CLICOLOR=1
+export EDITOR="vim"
+PLATFORM=`uname -s`
+case "$PLATFORM" in
+  "Darwin")
+    # Homebrew
+    export PATH=$PATH:/usr/local/bin
+    # Macports
+    export PATH=$PATH:/opt/local/bin:/opt/local/sbin
+;;
+  "Linux")
+    # Linux stuff here
+;;
+esac
+
+if [ -f $HOME/.pythonbrew/etc/bashrc ]; then
+  . $HOME/.pythonbrew/etc/bashrc
+fi
+
+# RVM
+if [[ -s "$HOME/.rvm/scripts/rvm" ]]; then
+  source "$HOME/.rvm/scripts/rvm"
+fi

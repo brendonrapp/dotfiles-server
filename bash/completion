@@ -1,0 +1,16 @@
+#!/bin/bash
+# vim set:syntax=bash
+
+# Macports
+if [ -f /opt/local/etc/bash_completion ]; then
+  . /opt/local/etc/bash_completion
+fi
+
+# Ubuntu
+if [ -f /etc/bash_completion ]; then
+  . /etc/bash_completion
+fi
+
+# "z" directory jump-list
+# https://github.com/rupa/z
+. ~/bin/z/z.sh

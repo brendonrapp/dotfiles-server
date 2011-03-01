@@ -1,0 +1,146 @@
+" .vimrc
+" My awesome vimrc
+
+" Pathogen
+" take any plugin, unzip/untar/svn-checkout/git-clone it to its own private directory in .vim/bundle,
+" and it will be added to the runtime path.
+" Initialization magic
+filetype off
+filetype plugin indent on
+call pathogen#runtime_append_all_bundles()
+filetype plugin on
+
+" Basic VIM settings
+let mapleader = ","
+set notitle           " no title splash
+set nocompatible      " no Vi compatibility mode, we want all Vim's new tricks
+set encoding=utf-8    " Unicode
+set ruler             " Line/column numbers
+set number            " Line numbers
+set vb t_vb=""        " Visual beep (disables audio beep) and sets visual beep to blank (disabling it too)`
+syntax on             " Syntax highlighting
+
+" Whitespace
+set shiftwidth=2      " Number of characters to shift with << and >>
+set tabstop=2         " Number of space characters for TAB
+set autoindent        " Use previous line indention on new line
+set smartindent       " Intelligently indent based on language syntax
+set wrap              " Enable wrapping (set nowrap to disable)
+set shiftround        " Indent to nearest tabstop
+set expandtab         " Insert spaces in place of TAB
+set list              " Make TAB characters visible
+set listchars=tab:>.  " Sets what characters to display for tabs
+
+" Searching
+set hlsearch          " Highlights searches
+set incsearch         " Incremental search - search as you type
+set ignorecase        " Disables case sensitivity in searches
+set smartcase         " Re-enables case sensitivity if search term contains an uppercase letter
+
+" UI
+set mouse=a           " Enable mouse
+set showmode          " Displays name of current mode (insert, visual, etc)
+" set showcmd           " Displays current command in progress
+set showmatch         " Cursor jumps to matching braces/parens when inserting new one
+set wildmenu          " Tab menu of commands for : command line
+" Binds Ctrl+V to paste, in insert mode only (still Visual Block in command mode)
+imap <C-V> <S-Insert> 
+" Binds Ctrl+C to copy
+vmap <C-C> "+y   
+" set autochdir       " Automatically change working directory to dir of current file in buffer
+
+" Backup directory - keep .swp files out of our file trees!
+set backupdir=~/.vim/backup
+set directory=~/.vim/backup
+
+" Fold column
+" set foldcolumn=3
+" hi FoldColumn guifg=black guibg=black
+" set foldmethod=syntax
+" set foldlevelstart=92
+
+"" MiniBufExpl configuration
+" let g:miniBufExplMapWindowNavVim = 1        " navigate windows with CTRL+Vim nav keys [hjkl]
+" let g:miniBufExplMapWindowNavArrows = 1   " navigte windows with CTRL+arrow keys
+" let g:miniBufExplMapCTabSwitchBufs = 1      " cycle buffers with CTRL+TAB (backwards with Shift+CTRL+Tab) 
+" let g:miniBufExplModSelTarget = 1           " prevent opening bufs in NERDTree or other non-modifiable windows
+" let g:miniBufExplUseSingleClick = 1       " select buffer with single mouse click (instead of default double-click)
+
+"" BufExplorer configuration
+map <C-b> :BufExplorer<CR>
+map <Leader>b :BufExplorer<CR>
+map f :BufExplorer<CR>
+
+"" NERDTree configuration
+let g:NERDTreeChDirMode=2                       " Change Vim working dir whenever changing NERDTree root node
+" Binds NERDTree to Ctrl+D
+map <C-d> :execute 'NERDTreeToggle ' .getcwd()<CR>
+" autocmd VimEnter * NERDTree                   " Start NERDTree on startup (part 1)
+" autocmd VimEnter * wincmd p                   " Start NERDTree on startup (part 2)
+" autocmd WinEnter * call NERDTreeQuit()        " Quit VIM if NERDTree is last remaining buffer
+
+"" Command-T configuration
+" Bind to Control-T
+map <C-t> :CommandT<CR>
+" Bind to Command-T for MacVim
+map <D-t> :CommandT<CR>                         
+let g:CommandTMaxHeight=20                      " Maximum result window height
+
+"" Supertab configuration
+" Checks user completion and omni completion, defaults to keyword if both fail
+" let g:SuperTabDefaultCompletionType = "context"
+" let g:SuperTabCompletionContexts = ['s:ContextDiscover', 's:ContextText']
+" let g:SuperTabContextDiscoverDiscovery = ["&completefunc:<c-x><c-u>", "&omnifunc:<c-x><c-o>"]
+" let g:SuperTabContextDefaultCompletionType = "<c-x><c-n>"
+" let g:SuperTabLongestHighlight = 1
+
+""" Language rules
+" Spacing
+autocmd FileType ruby,eruby,haml call TwoSpaces()
+autocmd FileType python call FourSpaces()
+autocmd FileType html call TwoSpaces()
+autocmd FileType sshconfig call TwoSpaces()
+autocmd FileType vim call TwoSpaces()
+autocmd FileType php call TwoSpaces()
+
+
+"""""""" FUNCTIONS """""""
+" Used in commands above "
+""""""""""""""""""""""""""
+
+" Tabs = 2 spaces
+function! TwoSpaces()
+  set tabstop=2
+  set shiftwidth=2
+endfunction
+
+" Tabs = 4 spaces
+function! FourSpaces()
+  set tabstop=4
+  set shiftwidth=4
+endfunction
+
+" Quit VIM if NERDTree is last remaining buffer
+" Taken from: https://github.com/scrooloose/nerdtree/issues#issue/21
+function! NERDTreeQuit()
+  redir => buffersoutput
+  silent buffers
+  redir END
+"                     1BufNo  2Mods.     3File           4LineNo
+  let pattern = '^\s*\(\d\+\)\(.....\) "\(.*\)"\s\+line \(\d\+\)$'
+  let windowfound = 0
+
+  for bline in split(buffersoutput, "\n")
+    let m = matchlist(bline, pattern)
+
+    if (len(m) > 0)
+      if (m[2] =~ '..a..')
+        let windowfound = 1
+      endif
+    endif
+  endfor
+
+  if (!windowfound)
+    quitall
+  endif
+endfunction

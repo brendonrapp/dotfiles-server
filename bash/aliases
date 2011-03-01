@@ -1,0 +1,35 @@
+#!/bin/sh
+# vim:set syntax=bash
+
+# TAB key cycles options
+bind '"\t":menu-complete'
+
+# Aliases
+alias resource='source ~/.bashrc'
+
+# Platform-specific aliases
+PLATFORM=`uname -s`
+case "$PLATFORM" in
+  "Darwin")
+    # color ls and human-readable filesizes for BSD ls
+    alias ls='ls -ahG'
+    alias lsl='ls -ahlG'
+    
+    # Homebrew
+    alias brewupdate='brew update && brew list | xargs brew install'
+;;
+  "Linux")
+    # color ls and human-readable filesizes for GNU ls
+    alias ls='ls -ah --color=auto'
+    alias lsl='ls -ahl --color=auto'
+;;
+esac
+
+# df human-readable filesizes
+alias df='df -hl'
+
+# print out sizes of each subdirectory inside current dor
+alias du1='du -h --max-depth=1'
+
+# Grep through current dir and subdirs for text
+alias greptree='find . -type f -print | xargs grep -li "$0"'
