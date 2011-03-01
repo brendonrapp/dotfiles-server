@@ -1,3 +1,72 @@
+### TASKS ###
+
+desc "Build everything!"
+task :all do
+  Rake::Task['git_submodules'].invoke
+  Rake::Task['home'].invoke
+  Rake::Task['bash'].invoke
+  Rake::Task['bin'].invoke
+  Rake::Task['vim'].invoke
+end
+
+desc "Init and update submodules"
+task :git_submodules do
+  system "git submodule init"
+  system "git submodule update"
+end
+
+desc "create symlinks to the files in the user's home dir"
+task :home do
+  puts_blue "linking files"
+  Dir["home/*"].each do |f|
+    symlink_home("#{f}", ".#{File.basename f}")
+  end
+end
+
+desc ".bash/ symlink"
+task :bash do
+  puts_blue "linking .bash/"
+  symlink_home('bash', '.bash')
+end
+
+desc "~/bin symlink"
+task :bin do
+  puts_blue "linking ~/bin"
+  symlink_home("bin", "bin")
+end
+
+desc ".vim/ symlink"
+task :vim do
+  puts_blue "linking .vim/"
+  symlink_home('vim', '.vim')
+  Rake::Task[':vim_install_plugins'].invoke
+  symlink_home('vim/bundle/256-color', '.vim/colors')
+  symlink_home('vim/pathogen/autoload', '.vim/autoload')
+  puts_green "Remember to run 'rake command-t[rvm-mri-version-number]', using the Ruby version that your Vim was built with"
+end
+
+desc "Compile Command-T plugin for vim"
+task :"command-t", :rvm do |task, args|
+  puts "RVM: #{args[:rvm]}"
+  if File.exists? "vim/bundle/command-t"
+    if system "cd vim/bundle/command-t/ruby/command-t && rvm #{args[:rvm]} rake make"
+      puts_green "Command-T installed. You win!"
+    end
+  else
+    puts_red "Command T submodule not found, run `rake submodule` to fetch it"
+  end
+end
+
+desc "Update all plugins in vim/bundle"
+task :vim_update_plugins do
+  dir = File.dirname(__FILE__)
+  Dir["vim/bundle/*"].each do |n|
+    puts "Updating #{n}"
+    `cd #{n}; git checkout master; git pull; cd #{dir}`
+  end
+end
+
+### UTILITY FUNCTIONS ###
 # Heavily borrowed from https://github.com/csexton/dotfiles
 
 def puts_red(str)
@@ -36,47 +105,3 @@ def symlink_home(src, dest)
     puts_red "  Unable to symlink #{dest} because it exists and is not a symlink"
   end
 end 
-
-desc "create symlinks to the files in the user's home dir"
-task :home do
-  puts_blue "linking files"
-  Dir["home/*"].each do |f|
-    symlink_home("#{f}", ".#{File.basename f}")
-  end
-end
-
-desc "~/bin symlink"
-task :bin do
-  puts_blue "linking ~/bin"
-  symlink_home("bin", "bin")
-end
-
-desc ".vim/ symlink"
-task :vim do
-  puts_blue "linking .vim/"
-  symlink_home('vim', '.vim')
-  Rake::Task[':vim_install_plugins'].invoke
-  symlink_home('vim/bundle/256-color', '.vim/colors')
-  symlink_home('vim/pathogen/pathogen.vim', '.vim/autoload/pathogen.vim')
-end
-
-desc "Install Vim plugins from Git"
-task :vim_install_plugins do
-  sh "git submodule init"
-  sh "git submodule update"
-end
-
-desc "Update all plugins in vim/bundle"
-task :vim_update_plugins do
-  dir = File.dirname(__FILE__)
-  Dir["vim/bundle/*"].each do |n|
-    puts "Updating #{n}"
-    `cd #{n}; git checkout master; git pull; cd #{dir}`
-  end
-end
-
-desc ".bash/ symlink"
-task :bash do
-  puts_blue "linking .bash/"
-  symlink_home('bash', '.bash')
-end
