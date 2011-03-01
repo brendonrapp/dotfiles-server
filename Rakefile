@@ -55,6 +55,15 @@ desc ".vim/ symlink"
 task :vim do
   puts_blue "linking .vim/"
   symlink_home('vim', '.vim')
+  Rake::Task[':vim_install_plugins'].invoke
+  symlink_home('vim/bundle/256-color', '.vim/colors')
+  symlink_home('vim/pathogen/pathogen.vim', '.vim/autoload/pathogen.vim')
+end
+
+desc "Install Vim plugins from Git"
+task :vim_install_plugins do
+  sh "git submodule init"
+  sh "git submodule update"
 end
 
 desc "Update all plugins in vim/bundle"
