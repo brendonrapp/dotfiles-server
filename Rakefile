@@ -44,15 +44,23 @@ task :vim do
   end
   symlink_home('vim/bundle/256-color', '.vim/colors')
   symlink_home('vim/pathogen/autoload', '.vim/autoload')
-  puts_green "Remember to run 'rake command-t[rvm-mri-version-number]', using the Ruby version that your Vim was built with"
+  puts_green ""
+  puts_green "NOTICE: Remember to build Command-T module"
+  puts_green "With RVM: rake command-t[rvm-version-number] (use MRI version that matches Ruby that your Vim was built with"
+  puts_green "Without RVM: rake command-t"
 end
 
 desc "Compile Command-T plugin for vim"
 task :"command-t", :rvm do |task, args|
-  puts "RVM: #{args[:rvm]}"
   if File.exists? "vim/bundle/command-t"
-    if system "cd vim/bundle/command-t/ruby/command-t && rvm #{args[:rvm]} rake make"
-      puts_green "Command-T installed. You win!"
+    if args[:rvm].nil?
+      if system"cd vim/bundle/command-t/ruby/command-t && rake make"
+        puts_green "Command-T installed with current Ruby"
+      end
+    else
+      if system "cd vim/bundle/command-t/ruby/command-t && rvm #{args[:rvm]} rake make"
+        puts_green "Command-T installed with RVM Ruby: #{args[:rvm]}"
+      end
     end
   else
     puts_red "Command T submodule not found, run `rake submodule` to fetch it"
