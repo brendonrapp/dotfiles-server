@@ -39,7 +39,9 @@ desc ".vim/ symlink"
 task :vim do
   puts_blue "linking .vim/"
   symlink_home('vim', '.vim')
-  Rake::Task[':vim_install_plugins'].invoke
+  unless File.exists? "vim/backup"
+    system "mkdir vim/backup"
+  end
   symlink_home('vim/bundle/256-color', '.vim/colors')
   symlink_home('vim/pathogen/autoload', '.vim/autoload')
   puts_green "Remember to run 'rake command-t[rvm-mri-version-number]', using the Ruby version that your Vim was built with"
