@@ -33,3 +33,7 @@ alias du1='du -h --max-depth=1'
 
 # Grep through current dir and subdirs for text
 alias greptree='find . -type f -print | xargs grep -li "$0"'
+
+# Restart apache
+alias a2reload='sudo /etc/init.d/apache2 reload'
+alias a2restart='sudo /etc/init.d/apache2 restart'
